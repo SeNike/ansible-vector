@@ -1,26 +1,37 @@
 ---
-- name: Vector_dist
-  ansible.builtin.get_url:
-    url: "https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.x86_64.rpm"
-    dest: "./vector-{{ vector_version }}-1.x86_64.rpm"
-    validate_certs: false
-    use_proxy: false 
-- name: Install Vector
-  become: true
-  ansible.builtin.yum:
-    name: "./vector-{{ vector_version }}-1.x86_64.rpm"
-    disable_gpg_check: true
-- name: Vector | Create Vector service
-  become: true
-  ansible.builtin.template:
-    src: vector.service.j2
-    dest: /etc/systemd/system/vector.service
-    mode: '0644'  
-- name: Deploy Vector configuration
-  become: true
-  ansible.builtin.template:
-    src: templates/vector.yml.j2
-    dest: /etc/vector/vector.yml
-    mode: "0644"              
-  notify:
-    - Start vector service
+# tasks file for clickhouse
+- name: 'Include OS Family Specific Variables'
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family | lower }}.yml"
+        - 'empty.yml'
+      paths:
+        - 'vars'
+  tags: [always]
+
+#- name: Print centos8 variables
+#  ansible.builtin.debug:
+#    var: hostvars['centos8']
+
+#- name: Print ubuntu variables
+#  ansible.builtin.debug:
+#    var: hostvars['ubuntu']
+
+- include_tasks: precheck.yml
+  tags: [always]
+
+- include_tasks:
+    file: "{{ lookup('first_found', params) }}"
+    apply:
+      tags: [install]
+  vars:
+    params:
+      files:
+        - "install/{{ ansible_pkg_mgr }}.yml"
+        - 'empty.yml'
+  tags: [install]
+
+
+

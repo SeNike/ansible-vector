@@ -1,4 +1,6 @@
 galaxy_info:
+  role_name: vector
+  namespace: my_namespace
   author: Sergey Nikiforov
   description: This role install vector
   company: soho
