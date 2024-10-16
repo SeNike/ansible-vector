@@ -9,10 +9,12 @@ platforms:
     pre_build_image: true
     privileged: true
     command: "/usr/sbin/init"
+    docker_host: "unix:///var/run/docker.sock"
   - name: ubuntu
     image: docker.io/pycontribs/ubuntu:latest
     pre_build_image: true  
     privileged: true
+    docker_host: "unix:///var/run/docker.sock"
 provisioner:
   name: ansible
 verifier:
